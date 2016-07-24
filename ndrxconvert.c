@@ -42,8 +42,8 @@ PyObject* ubf_to_dict(UBFH* ubf) {
 	/* get next field id and occurence */
 	res = Bnext(ubf, &id, &oc, NULL, NULL);
 	if (res <= 0) break;
-	if ((name = Bbfname(id)) == NULL) {
-	    bprintf(stderr, "Bfname(%lu): %s", (long)id, Bstrerror(Berror));
+	if ((name = Bfname(id)) == NULL) {
+	    fprintf(stderr, "Bfname(%lu): %s", (long)id, Bstrerror(Berror));
 	    result = NULL;
 	    goto leave_func;
 	}
@@ -88,7 +88,7 @@ PyObject* ubf_to_dict(UBFH* ubf) {
 	    char msg[100];
 	    sprintf(msg, "unsupported UBF type <%s>", type);
 	    PyErr_SetString(PyExc_RuntimeError, msg);
-	    bprintf(stderr, "Btype(): %s", Bstrerror(Berror));
+	    fprintf(stderr, "Btype(): %s", Bstrerror(Berror));
 
 	    result =  NULL;
 	    goto leave_func;
@@ -97,7 +97,7 @@ PyObject* ubf_to_dict(UBFH* ubf) {
     }
     if (res < 0) {
 	PyErr_SetString(PyExc_RuntimeError, "Problems with Bnext()");
-	bprintf(stderr, "Bnext(): %s", Bstrerror(Berror));
+	fprintf(stderr, "Bnext(): %s", Bstrerror(Berror));
 
 	result =  NULL;
 	goto leave_func;
@@ -130,12 +130,12 @@ UBFH* dict_to_ubf(PyObject* dict) {
     printf("\n");
 #endif
     if ((ubf = (UBFH*)tpalloc("UBF", NULL, NDRXBUFSIZE)) == NULL) {
-	bprintf(stderr, "tpalloc(): %s\n", tpstrerror(tperrno));
+	fprintf(stderr, "tpalloc(): %s\n", tpstrerror(tperrno));
 	goto leave_func;
     }
     
     if (Binit(ubf, NDRXBUFSIZE) < 0) {
-	bprintf(stderr, "Binit(): %s\n", Bstrerror(Berror));
+	fprintf(stderr, "Binit(): %s\n", Bstrerror(Berror));
 	goto leave_func;
     }
 
@@ -147,7 +147,7 @@ UBFH* dict_to_ubf(PyObject* dict) {
 	key = PyList_GetItem(keylist, idx);  /* borrowed reference */
 
 	if (!key) {
-	    bprintf(stderr, "PyList_GetItem(keys, %d) returned NULL\n", idx);
+	    fprintf(stderr, "PyList_GetItem(keys, %d) returned NULL\n", idx);
 	    goto leave_func;
 	}
 	
@@ -167,14 +167,14 @@ UBFH* dict_to_ubf(PyObject* dict) {
 
 	    cval = PyString_AsString(vallist);
 	    if (cval == NULL) {
-		bprintf(stderr, "error in PyString_AsString()\n");
+		fprintf(stderr, "error in PyString_AsString()\n");
 		goto leave_func;
 	    }
 	    if (Bchgs(ubf, id, 0, cval) < 0) {
 		if (Berror == BNOSPACE) {
 		    /* realloc buffer */
 		}
-		bprintf(stderr, "error in Bchgs() : %s\n", Bstrerror(Berror));
+		fprintf(stderr, "error in Bchgs() : %s\n", Bstrerror(Berror));
 		goto leave_func;
 	    }		    
 	} else {	    
@@ -191,7 +191,7 @@ UBFH* dict_to_ubf(PyObject* dict) {
 
 		/* !!! type given by field id, not by Python types !!! */		
 
-		bfldtype = Bbfldtype(id);
+		bfldtype = Bfldtype(id);
 		
 		switch (bfldtype) {
 		case BFLD_LONG:
@@ -204,7 +204,7 @@ UBFH* dict_to_ubf(PyObject* dict) {
 			cval = PyLong_AsLong(pyvalue);
 			
 			if (Bchg(ubf, id, oc,(char*) &cval, len) < 0) {
-			    bprintf(stderr, "error in Bchg(): %s\n", Bstrerror(Berror));
+			    fprintf(stderr, "error in Bchg(): %s\n", Bstrerror(Berror));
 			    goto leave_func;
 			}		    
 			break;
@@ -217,7 +217,7 @@ UBFH* dict_to_ubf(PyObject* dict) {
 			cval = PyInt_AsLong(pyvalue);
 			
 			if (Bchg(ubf, id, oc,(char*) &cval, len) < 0) {
-			    bprintf(stderr, "error in Bchg(): %s\n", Bstrerror(Berror));
+			    fprintf(stderr, "error in Bchg(): %s\n", Bstrerror(Berror));
 			    goto leave_func;
 			}		    
 			break;
@@ -234,12 +234,12 @@ UBFH* dict_to_ubf(PyObject* dict) {
 
 			lval = atol(cval);
 			if (Bchg(ubf, id, oc,(char*) &lval, (BFLDLEN)sizeof(long)) < 0) {
-			    bprintf(stderr, "error in Bchg(): %s\n", Bstrerror(Berror));
+			    fprintf(stderr, "error in Bchg(): %s\n", Bstrerror(Berror));
 			    goto leave_func;
 			}		    
 			break;
 		    }
-		    bprintf(stderr, 
+		    fprintf(stderr, 
 			    "could not convert value for key %s to UBF type BFLD_LONG\n",
 			    key_cstring);
 		    goto leave_func;
@@ -256,7 +256,7 @@ UBFH* dict_to_ubf(PyObject* dict) {
 			sprintf(string, "%f", cval);
 
 			if (Bchgs(ubf, id, oc, string) < 0) {
-			    bprintf(stderr, "error in Bchgs(): %s\n", Bstrerror(Berror));
+			    fprintf(stderr, "error in Bchgs(): %s\n", Bstrerror(Berror));
 			    goto leave_func;
 			}		    
 			break;
@@ -270,7 +270,7 @@ UBFH* dict_to_ubf(PyObject* dict) {
 			sprintf(string, "%ld", cval);
 			
 			if (Bchgs(ubf, id, oc, string) < 0) {
-			    bprintf(stderr, "error in Bchgs(): %s\n", Bstrerror(Berror));
+			    fprintf(stderr, "error in Bchgs(): %s\n", Bstrerror(Berror));
 			    goto leave_func;
 			}		    
 			break;
@@ -284,7 +284,7 @@ UBFH* dict_to_ubf(PyObject* dict) {
 			sprintf(string, "%ld", cval);
 			
 			if (Bchgs(ubf, id, oc, string) < 0) {
-			    bprintf(stderr, "error in Bchgs(): %s\n", Bstrerror(Berror));
+			    fprintf(stderr, "error in Bchgs(): %s\n", Bstrerror(Berror));
 			    goto leave_func;
 			}		    
 			break;
@@ -299,20 +299,20 @@ UBFH* dict_to_ubf(PyObject* dict) {
 			}
 
 			if (Bchgs(ubf, id, oc, cval) < 0) {
-			    bprintf(stderr, "error in Bchgs(): %s\n", Bstrerror(Berror));
+			    fprintf(stderr, "error in Bchgs(): %s\n", Bstrerror(Berror));
 			    goto leave_func;
 			}		    
 			break;
 		    }
 
-		    bprintf(stderr, 
+		    fprintf(stderr, 
 			    "could not convert value for key %s to UBF type BFLD_STRING\n",
 			    key_cstring);
 		    goto leave_func;
 		    
 		    break;
 		default:
-		    bprintf(stderr, "unsupported UBF type %d\n", bfldtype);
+		    fprintf(stderr, "unsupported UBF type %d\n", bfldtype);
 		    goto leave_func;
 		}
 		/* Not recognized types do not cause an error and are simply discarded */
@@ -347,7 +347,7 @@ char* pystring_to_string(PyObject* pystring) {
     len = strlen(PyString_AsString(pystring));
 
     if ((string = (char*)tpalloc("STRING", NULL, len+1)) == NULL) {
-	bprintf(stderr, "tpalloc(): %s\n", tpstrerror(tperrno));
+	fprintf(stderr, "tpalloc(): %s\n", tpstrerror(tperrno));
 	goto leave_func;
     }
 
@@ -368,7 +368,7 @@ PyObject* string_to_pystring(char* string) {
     PyObject*     pystring = NULL;
 
     if ((pystring = Py_BuildValue("s", string)) == NULL) {
-	bprintf(stderr, "Py_BuildValue(): %s", string);
+	fprintf(stderr, "Py_BuildValue(): %s", string);
 	goto leave_func;
     }
     

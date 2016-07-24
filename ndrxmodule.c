@@ -18,10 +18,10 @@
 #include <pthread.h>            /* System header file */  
 #endif /* USE_THREADS */
 
-#include <xa.h>                 /* ENDUROX Header File */
+//#include <xa.h>                 /* ENDUROX Header File */
 #include <atmi.h>               /* ENDUROX Header File */
 #include "ubf.h"                /* ENDUROX Header File */
-#include <tpadm.h>		/* ENDUROX Header File */
+//#include <tpadm.h>		/* ENDUROX Header File */
 #include <userlog.h>            /* ENDUROX Header File */
 #include <ubf.h>              /* ENDUROX Header File */
 
@@ -389,14 +389,14 @@ static PyObject* transform_ndrx_to_py(char* ndrxbuf) {
     if (!strcmp(buffer_type, "UBF")) {
 	if ((obj = ubf_to_dict((UBFH*)ndrxbuf)) == NULL) {
 #ifdef DEBUG
-	    bprintf(stderr, "no ubf buffer\n");
+	    fprintf(stderr, "no ubf buffer\n");
 #endif
 	    goto leave_func;
 	}	
     } else if (!strcmp(buffer_type, "STRING")) {
 	if ((obj = string_to_pystring((char*)ndrxbuf)) == NULL) {
 #ifdef DEBUG
-	    bprintf(stderr, "no string buffer\n");
+	    fprintf(stderr, "no string buffer\n");
 #endif
 	    goto leave_func;
 	}	
@@ -437,7 +437,8 @@ mainloop(int argc, char** argv) {
 #endif
     int res = 0;
     
-    res = _tmstartserver( argc, argv, _tmgetsvrargs());
+    //res = _tmstartserver( argc, argv, _tmgetsvrargs());
+    res = ndrx_main(argc, argv);
 }
 
 /* }}} */
@@ -489,7 +490,7 @@ ndrx_tpcall(PyObject * self, PyObject * args)
     {
 	char bubfname[200] = "";
 	tptypes(ndrxbuf, bubfname, NULL);
-	bprintf(stderr, "calling tpcall(%s, [%s]...)\n", service_name, bubfname);
+	fprintf(stderr, "calling tpcall(%s, [%s]...)\n", service_name, bubfname);
     }
 #endif
     
@@ -553,17 +554,18 @@ ndrx_tpadmcall(PyObject * self, PyObject * args)
     {
 	char bubfname[200] = "";
 	tptypes(ndrxbuf, bubfname, NULL);
-	bprintf(stderr, "calling tpadmcall([%s]...)\n", bubfname);
+	fprintf(stderr, "calling tpadmcall([%s]...)\n", bubfname);
     }
 #endif
-    
+
+/*    
     if (tpadmcall((UBFH*)ndrxbuf, (UBFH**)&ndrxbuf, flags ) < 0) {
 	char tmp[200] = "";
 	sprintf(tmp, "tpadmcall(): %d - %s", tperrno, tpstrerror(tperrno));
 	PyErr_SetString(PyExc_RuntimeError, tmp);
 	goto leave_func;
     }
-    
+*/  
 
     
     if ((result = transform_ndrx_to_py(ndrxbuf)) == NULL) {
@@ -662,7 +664,7 @@ ndrx_tpgetrply(PyObject * self, PyObject * args)
 
     /* Buffer type will be changed by tpgetrply() if necessary */
     if ((ndrxbuf = tpalloc("UBF", NULL, NDRXBUFSIZE)) == NULL) {
-	bprintf(stderr, "tpalloc(): %d - %s\n", tperrno, tpstrerror(tperrno));
+	fprintf(stderr, "tpalloc(): %d - %s\n", tperrno, tpstrerror(tperrno));
 	goto leave_func;
     }
 
@@ -674,7 +676,7 @@ ndrx_tpgetrply(PyObject * self, PyObject * args)
     }
     
     if (Binit((UBFH*)ndrxbuf, NDRXBUFSIZE) < 0) {
-	bprintf(stderr, "tpgetrply(): Binit(): %s\n", Bstrerror(Berror));
+	fprintf(stderr, "tpgetrply(): Binit(): %s\n", Bstrerror(Berror));
 	goto leave_func;
     }
 
@@ -908,12 +910,12 @@ ndrx_tprecv(PyObject * self, PyObject * args)
 
     /* Buffer type will be changed by tprecv() if necessary */
     if ((ndrxbuf = tpalloc("UBF", NULL, NDRXBUFSIZE)) == NULL) {
-	bprintf(stderr, "tpalloc(): %d - %s\n", tperrno, tpstrerror(tperrno));
+	fprintf(stderr, "tpalloc(): %d - %s\n", tperrno, tpstrerror(tperrno));
 	goto leave_func;
     }
     
     if (Binit((UBFH*)ndrxbuf, NDRXBUFSIZE) < 0) {
-	bprintf(stderr, "Binit(): %s\n", Bstrerror(Berror));
+	fprintf(stderr, "Binit(): %s\n", Bstrerror(Berror));
 	goto leave_func;
     }
 
@@ -1143,7 +1145,7 @@ static PyObject* ndrx_tpsuspend(PyObject* self, PyObject* arg) {
     int ret    = -1;
     long flags = 0;
 
-    char tranid_strrep[TPCONVMAXSTR+1] = "";
+    //char tranid_strrep[TPCONVMAXSTR+1] = "";
     TPTRANID tranid_binrep;
 
     if (PyArg_ParseTuple(arg, "|O", &flags_py) < 0) {
@@ -1259,12 +1261,12 @@ ndrx_tpinit(PyObject * self, PyObject * args)
     int idx = 0;
 
 #ifdef DEBUG
-    bprintf(stderr, "entering ndrx_tpinit(args= %x0x) ...\n", args);
+    fprintf(stderr, "entering ndrx_tpinit(args= %x0x) ...\n", args);
 #endif
     if (args) {
 	if (PyArg_ParseTuple(args, "O|O", &input) < 0) {
 #ifdef DEBUG
-	    bprintf(stderr, "parseTuple (ndrx_tpinit)\n");
+	    fprintf(stderr, "parseTuple (ndrx_tpinit)\n");
 #endif
 	    goto leave_func;
 	}
@@ -1284,7 +1286,7 @@ ndrx_tpinit(PyObject * self, PyObject * args)
 
 	keylist = PyDict_Keys(input);
 	if (!keylist) {
-	    bprintf(stderr, "tpinit(): PyDict_Keys(keys, %d) returned NULL\n", idx);
+	    fprintf(stderr, "tpinit(): PyDict_Keys(keys, %d) returned NULL\n", idx);
 	    goto leave_func;
 
 	}	    
@@ -1296,7 +1298,7 @@ ndrx_tpinit(PyObject * self, PyObject * args)
 
 	    key = PyList_GetItem(keylist, idx);  /* borrowed reference */
 	    if (!key) {
-		bprintf(stderr, "tpinit(): PyList_GetItem(keys, %d) returned NULL\n", idx);
+		fprintf(stderr, "tpinit(): PyList_GetItem(keys, %d) returned NULL\n", idx);
 		goto leave_func;
 	    }
 	    key_cstring = PyString_AsString(key);
@@ -1342,9 +1344,9 @@ ndrx_tpinit(PyObject * self, PyObject * args)
 	}
     }
 #ifdef DEBUG
-	bprintf(stderr, "calling tpinit()\n");
+	fprintf(stderr, "calling tpinit()\n");
 	if (ndrxbuf)
-	    bprintf(stderr, "usrname = >%s<, cltname = >%s<\n", 
+	    fprintf(stderr, "usrname = >%s<, cltname = >%s<\n", 
 		    ndrxbuf->usrname, ndrxbuf->cltname);
 #endif
 	
@@ -1576,7 +1578,7 @@ static PyObject* ndrx_tpunadvertise(PyObject* self, PyObject* arg) {
 
     if (delete_entry(svc_name) < 0) {
 	PyErr_SetString(PyExc_RuntimeError, "tpunadvertise(): internal data corrupted");
-	bprintf(stderr, "Not found: %s\n", svc_name);
+	fprintf(stderr, "Not found: %s\n", svc_name);
 	goto leave_func;
     }
 
@@ -2102,7 +2104,7 @@ static PyObject* ndrx_tpnotify(PyObject* self, PyObject* arg) {
 
     if ((clientid_string = PyString_AsString(clientid_py)) == NULL) {
 #ifdef DEBUG
-	bprintf(stderr, "tpnotify(): No client name given \n");
+	fprintf(stderr, "tpnotify(): No client name given \n");
 #endif
 	goto leave_func;
     }
@@ -2228,7 +2230,7 @@ static void unsol_handler(char* ndrxbuf, long len, long flags) {
        (only STRING/UBF is supported), flags is not supported by ENDUROX */
 
     if ((data_py = transform_ndrx_to_py(ndrxbuf)) == NULL) {
-	bprintf(stderr, "transform_ndrx_to_py failed\n");
+	fprintf(stderr, "transform_ndrx_to_py failed\n");
 	goto leave_func;
     }
 
@@ -2380,7 +2382,7 @@ ndrx_mainloop(PyObject * self, PyObject * args)
     if (!PyArg_ParseTuple(args, "OOO|O", 
 			  &argv_obj, &_server_obj, &_reloader_function, &xa_switch)) {
 #ifdef DEBUG
-	bprintf(stderr, "parseTuple 2\n");
+	fprintf(stderr, "parseTuple 2\n");
 #endif
 	return NULL;
     }
@@ -2401,12 +2403,12 @@ ndrx_mainloop(PyObject * self, PyObject * args)
 	if (PyString_Check(tmp)) {
 	    if (!(argv[i] = PyString_AsString(tmp))) {
 #ifdef DEBUG
-		bprintf(stderr, "argv[%d]: PyString_asString() \n", i);
+		fprintf(stderr, "argv[%d]: PyString_asString() \n", i);
 #endif
 		return NULL;
 	    }
 #ifdef DEBUG
-		bprintf(stdout, "argv[%d] = %s \n", i, argv[i]);
+		fprintf(stdout, "argv[%d] = %s \n", i, argv[i]);
 #endif
 
 	}
@@ -2507,7 +2509,7 @@ PyMODINIT_FUNC
     ins(d, "TPCONVTRANID", TPCONVTRANID);	/* Convert TRANID */
     ins(d, "TPCONVXID", TPCONVXID);	/* Convert XID */
 
-    ins(d, "TPCONVMAXSTR", TPCONVMAXSTR);		/* Maximum string size */
+    //ins(d, "TPCONVMAXSTR", TPCONVMAXSTR);		/* Maximum string size */
 
     /* Return values to tpchkauth() */
     ins(d, "TPNOAUTH", TPNOAUTH); /*authentication */
@@ -2654,7 +2656,7 @@ void endurox_dispatch(TPSVCINFO * rqst) {
     PyObject *py_cd = NULL;
     PyObject *py_flags = NULL;
     PyObject *py_appkey = NULL;
-    char cltid_string[TPCONVMAXSTR+1] = "";
+    //char cltid_string[TPCONVMAXSTR+1] = "";
     char* res_ndrx = NULL;
     long tp_returncode = TPSUCCESS;
 
@@ -2696,7 +2698,7 @@ void endurox_dispatch(TPSVCINFO * rqst) {
     py_name = PyString_FromString(rqst->name);
     if (py_name) {
 	if (PyObject_SetAttrString(_server_obj, "name", py_name) < 0) {
-	    bprintf(stderr, "PyObject_SetAttrString( name ) error\n");
+	    fprintf(stderr, "PyObject_SetAttrString( name ) error\n");
 	}
 	Py_DECREF(py_name); 
 	py_name = NULL;
@@ -2707,7 +2709,7 @@ void endurox_dispatch(TPSVCINFO * rqst) {
     py_cd = PyInt_FromLong(rqst->cd);
     if (py_cd && (rqst->flags & TPCONV)) {
 	if (PyObject_SetAttrString( _server_obj, "cd", py_cd) < 0) {
-	    bprintf(stderr, "PyObject_SetAttrString( cd ) error\n");
+	    fprintf(stderr, "PyObject_SetAttrString( cd ) error\n");
 	}
     }
     if (py_cd) { 
@@ -2717,7 +2719,7 @@ void endurox_dispatch(TPSVCINFO * rqst) {
     py_flags = PyLong_FromLong(rqst->flags);
     if (py_flags) {
 	if (PyObject_SetAttrString(_server_obj, "flags", py_flags) < 0) {
-	    bprintf(stderr, "PyObject_SetAttrString( flags ) error\n");
+	    fprintf(stderr, "PyObject_SetAttrString( flags ) error\n");
 	}
 	Py_DECREF(py_flags);
 	py_flags = NULL;
@@ -2726,7 +2728,7 @@ void endurox_dispatch(TPSVCINFO * rqst) {
     py_appkey = PyLong_FromLong(rqst->appkey);
     if (py_appkey) {
 	if (PyObject_SetAttrString(_server_obj, "appkey", py_appkey) < 0) {
-	    bprintf(stderr, "PyObject_SetAttrString( appkey ) error\n");
+	    fprintf(stderr, "PyObject_SetAttrString( appkey ) error\n");
 	}
 	Py_DECREF(py_appkey);
 	py_appkey = NULL;
@@ -2735,21 +2737,21 @@ void endurox_dispatch(TPSVCINFO * rqst) {
     /* convert CLIENTID to string */
     
     if (tpconvert(cltid_string, (char*)(rqst->cltid).clientdata, TPTOSTRING | TPCONVCLTID) == -1) {
-	bprintf(stderr, "tpconvert(bin_clientid -> string_clientid): %d - %s", tperrno, tpstrerror(tperrno));
+	fprintf(stderr, "tpconvert(bin_clientid -> string_clientid): %d - %s", tperrno, tpstrerror(tperrno));
 	tpreturn(TPFAIL, _set_tpurcode, 0, 0L, 0);
     }
 
     py_cltid = PyString_FromString(cltid_string);
     if (py_cltid) {
 	if (PyObject_SetAttrString(_server_obj, "cltid", py_cltid) < 0) {
-	    bprintf(stderr, "PyObject_SetAttrString( cltid ) error\n");
+	    fprintf(stderr, "PyObject_SetAttrString( cltid ) error\n");
 	}
 	Py_DECREF(py_cltid); 
 	py_cltid = NULL;
     }
 
     if ((idx=find_entry(rqst->name)) < 0) {
-	bprintf(stderr, "unknown servicename\n");
+	fprintf(stderr, "unknown servicename\n");
 	tpreturn(TPFAIL, _set_tpurcode, 0, 0L, 0);
     }
 
@@ -2759,7 +2761,7 @@ void endurox_dispatch(TPSVCINFO * rqst) {
 #endif
 
     if ((obj = transform_ndrx_to_py(rqst->data)) == NULL) {
-	bprintf(stderr, "Cannot convert input buffer to a Python type\n");
+	fprintf(stderr, "Cannot convert input buffer to a Python type\n");
 	tpreturn(TPFAIL, _set_tpurcode, 0, 0L, 0);
     }
 
@@ -2769,7 +2771,7 @@ void endurox_dispatch(TPSVCINFO * rqst) {
     
     if (!(pydata = PyObject_CallMethod(_server_obj, _registered_services[idx].method, "O", obj))) {
 	Py_XDECREF(obj);
-	bprintf(stderr, "Error calling method %s ...\n", _registered_services[idx].method);
+	fprintf(stderr, "Error calling method %s ...\n", _registered_services[idx].method);
 	tpreturn(TPFAIL, _set_tpurcode, 0, 0L, 0);
     }
 
@@ -2808,7 +2810,7 @@ void endurox_dispatch(TPSVCINFO * rqst) {
 	    tp_returncode = TPSUCCESS; 
 	    break;
 	default:
-	    bprintf(stderr, "Unknown integer return code (assuming TPEXIT)");
+	    fprintf(stderr, "Unknown integer return code (assuming TPEXIT)");
 	    PyErr_SetString(PyExc_RuntimeError, "Unknown integer return code (assuming TPEXIT)");
 	    tp_returncode = TPEXIT;
 	}
