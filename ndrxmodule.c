@@ -1173,14 +1173,16 @@ static PyObject* ndrx_tpsuspend(PyObject* self, PyObject* arg) {
     /* convert the binary (long[6]) transaction ID to a string
        representation that can be returned to the caller */
     
+    /*
     if (tpconvert(tranid_strrep, (char*)&tranid_binrep, TPCONVTRANID | TPTOSTRING) < 0) {
 	char tmp[200] = "";
 	sprintf(tmp, "tpconvert(TRANID)(): %d - %s", tperrno, tpstrerror(tperrno));
 	PyErr_SetString(PyExc_RuntimeError, tmp);
 	goto leave_func;
     }
+    */
     
-    result = PyString_FromString(tranid_strrep);
+    //result = PyString_FromString(tranid_strrep);
 
  leave_func:
     return result; 
@@ -1196,16 +1198,18 @@ static PyObject* ndrx_tpresume(PyObject* self, PyObject* arg) {
     PyObject * result         = NULL;
     PyObject * flags_py       = NULL;
 
-    char*  tranid_strrep = NULL;
+    //char*  tranid_strrep = NULL;
     
     TPTRANID tranid_binrep;
 
+    /*
     if (PyArg_ParseTuple(arg, "s|O", &tranid_strrep, &flags_py) < 0) {
 	goto leave_func;
-    }	
+    }
+    */	
     
 
-    ret = tpconvert(tranid_strrep, (char*)&tranid_binrep, TPCONVTRANID);
+    //ret = tpconvert(tranid_strrep, (char*)&tranid_binrep, TPCONVTRANID);
     if (ret < 0) {
 	char tmp[200] = "";
 	sprintf(tmp, "tpconvert(TRANID): %d - %s", tperrno, tpstrerror(tperrno));
@@ -2113,12 +2117,14 @@ static PyObject* ndrx_tpnotify(PyObject* self, PyObject* arg) {
 	goto leave_func;
     }
 
+    /*
     if (tpconvert((char*)clientid_string, (char*)&clientid, TPCONVCLTID) == -1) {
 	char tmp[200] = "";
 	sprintf(tmp, "tpconvert(string_clientid -> bin_clientid): %d - %s", tperrno, tpstrerror(tperrno));
 	PyErr_SetString(PyExc_RuntimeError, tmp);
 	goto leave_func;
     }
+    */
     
     if(tpnotify(&clientid, ndrxbuf, 0, flags) == -1) {
 	char tmp[200] = "";
@@ -2264,6 +2270,7 @@ static PyObject* ndrx_tpsetunsol(PyObject* self, PyObject* arg) {
 	goto leave_func;
     }
 
+    /*
     if (py_unsol_handler == Py_None) {
 	if (tpsetunsol(NULL) == TPUNSOLERR) {
 	    sprintf(tmp, "tpsetunsol(NULL): %d - %s", tperrno, tpstrerror(tperrno));
@@ -2276,9 +2283,15 @@ static PyObject* ndrx_tpsetunsol(PyObject* self, PyObject* arg) {
 	    PyErr_SetString(PyExc_RuntimeError, tmp);
 	    goto leave_func;
 	}
-	/* store the python function, it will be called by the unsol_handler */
+	store the python function, it will be called by the unsol_handler */
 	Py_INCREF(py_unsol_handler); /* needed */
+    
 	
+    //} 
+    if (py_unsol_handler == Py_None) {
+        goto leave_func;
+    } else if (PyCallable_Check(py_unsol_handler)){
+        goto leave_func;
     } else {
 	sprintf(tmp, "tpsetunsol(): No callable object given");
 	PyObject_Print(py_unsol_handler, stdout, 0);
@@ -2464,7 +2477,7 @@ PyMODINIT_FUNC
 
     ins(d, "TPSUCCESS",	TPSUCCESS);
     ins(d, "TPFAIL",	TPFAIL);
-    ins(d, "TPEXIT",	TPEXIT);
+    //ins(d, "TPEXIT",	TPEXIT);
 
 
     /* Flags */
@@ -2480,7 +2493,7 @@ PyMODINIT_FUNC
     ins(d, "TPABSOLUTE", TPABSOLUTE);	/* absolute value on tmsetprio */
     ins(d, "TPGETANY", TPGETANY);	/* get any valid reply */
     ins(d, "TPNOCHANGE", TPNOCHANGE);	/* force incoming buffer to match */
-    ins(d, "RESERVED_BIT1", RESERVED_BIT1);	/* reserved for future use */
+    //ins(d, "RESERVED_BIT1", RESERVED_BIT1);	/* reserved for future use */
     ins(d, "TPCONV", TPCONV);	/* conversational service */
     ins(d, "TPSENDONLY", TPSENDONLY);	/* send-only mode */
     ins(d, "TPRECVONLY", TPRECVONLY);	/* recv-only mode */
@@ -2488,33 +2501,33 @@ PyMODINIT_FUNC
 
 
     /* Flags to tpscmt() - Valid TP_COMMIT_CONTROL characteristic values */
-    ins(d, "TP_CMT_LOGGED", TP_CMT_LOGGED);  /* return after commit decision is logged */
-    ins(d, "TP_CMT_COMPLETE", TP_CMT_COMPLETE);	/* return after commit has completed */
+    //ins(d, "TP_CMT_LOGGED", TP_CMT_LOGGED);  /* return after commit decision is logged */
+    //ins(d, "TP_CMT_COMPLETE", TP_CMT_COMPLETE);	/* return after commit has completed */
 
 
     /* Flags to tpinit() */
-    ins(d, "TPU_MASK", TPU_MASK); /* unsolicited notification mask */
-    ins(d, "TPU_SIG", TPU_SIG);	/* signal based notification */
-    ins(d, "TPU_DIP", TPU_DIP);	/* dip-in based notification */
-    ins(d, "TPU_IGN", TPU_IGN);	/* ignore unsolicited messages */
+    //ins(d, "TPU_MASK", TPU_MASK); /* unsolicited notification mask */
+    //ins(d, "TPU_SIG", TPU_SIG);	/* signal based notification */
+    //ins(d, "TPU_DIP", TPU_DIP);	/* dip-in based notification */
+    //ins(d, "TPU_IGN", TPU_IGN);	/* ignore unsolicited messages */
 
-    ins(d, "TPSA_FASTPATH", TPSA_FASTPATH);	/* System access == fastpath */
-    ins(d, "TPSA_PROTECTED", TPSA_PROTECTED);	/* System access == protected */
+    //ins(d, "TPSA_FASTPATH", TPSA_FASTPATH);	/* System access == fastpath */
+    //ins(d, "TPSA_PROTECTED", TPSA_PROTECTED);	/* System access == protected */
 
-    ins(d, "TPMULTICONTEXTS", TPMULTICONTEXTS);	/* Enable MULTI context */
+    //ins(d, "TPMULTICONTEXTS", TPMULTICONTEXTS);	/* Enable MULTI context */
 
     /* Flags to tpconvert() */
-    ins(d, "TPTOSTRING", TPTOSTRING);	/* Convert structure to string */
-    ins(d, "TPCONVCLTID", TPCONVCLTID);	/* Convert CLIENTID */
-    ins(d, "TPCONVTRANID", TPCONVTRANID);	/* Convert TRANID */
-    ins(d, "TPCONVXID", TPCONVXID);	/* Convert XID */
+    //ins(d, "TPTOSTRING", TPTOSTRING);	/* Convert structure to string */
+    //ins(d, "TPCONVCLTID", TPCONVCLTID);	/* Convert CLIENTID */
+    //ins(d, "TPCONVTRANID", TPCONVTRANID);	/* Convert TRANID */
+    //ins(d, "TPCONVXID", TPCONVXID);	/* Convert XID */
 
     //ins(d, "TPCONVMAXSTR", TPCONVMAXSTR);		/* Maximum string size */
 
     /* Return values to tpchkauth() */
-    ins(d, "TPNOAUTH", TPNOAUTH); /*authentication */
-    ins(d, "TPSYSAUTH", TPSYSAUTH); /*authentication */
-    ins(d, "TPAPPAUTH", TPAPPAUTH); /* and application authentication */
+    //ins(d, "TPNOAUTH", TPNOAUTH); /*authentication */
+    //ins(d, "TPSYSAUTH", TPSYSAUTH); /*authentication */
+    //ins(d, "TPAPPAUTH", TPAPPAUTH); /* and application authentication */
 
     ins(d, "MAXTIDENT", MAXTIDENT); /*len of a /T identifier */
 
@@ -2538,8 +2551,8 @@ PyMODINIT_FUNC
     /* Event Subscription related constants */
 
     ins(d, "TPEVSERVICE", TPEVSERVICE);
-    ins(d, "TPEVQUEUE", TPEVQUEUE  );
-    ins(d, "TPEVTRAN", TPEVTRAN   );
+    //ins(d, "TPEVQUEUE", TPEVQUEUE  );
+    //ins(d, "TPEVTRAN", TPEVTRAN   );
     ins(d, "TPEVPERSIST", TPEVPERSIST);
 
     
@@ -2736,11 +2749,14 @@ void endurox_dispatch(TPSVCINFO * rqst) {
     
     /* convert CLIENTID to string */
     
+    /*
     if (tpconvert(cltid_string, (char*)(rqst->cltid).clientdata, TPTOSTRING | TPCONVCLTID) == -1) {
 	fprintf(stderr, "tpconvert(bin_clientid -> string_clientid): %d - %s", tperrno, tpstrerror(tperrno));
 	tpreturn(TPFAIL, _set_tpurcode, 0, 0L, 0);
     }
+    */
 
+    /*
     py_cltid = PyString_FromString(cltid_string);
     if (py_cltid) {
 	if (PyObject_SetAttrString(_server_obj, "cltid", py_cltid) < 0) {
@@ -2749,6 +2765,7 @@ void endurox_dispatch(TPSVCINFO * rqst) {
 	Py_DECREF(py_cltid); 
 	py_cltid = NULL;
     }
+    */
 
     if ((idx=find_entry(rqst->name)) < 0) {
 	fprintf(stderr, "unknown servicename\n");
@@ -2803,16 +2820,20 @@ void endurox_dispatch(TPSVCINFO * rqst) {
 	case TPFAIL: 
 	    tp_returncode = TPFAIL; 
 	    break;
+        /*
 	case TPEXIT: 
 	    tp_returncode = TPEXIT; 
 	    break;
+        */
 	case TPSUCCESS:
 	    tp_returncode = TPSUCCESS; 
 	    break;
+        /*
 	default:
 	    fprintf(stderr, "Unknown integer return code (assuming TPEXIT)");
 	    PyErr_SetString(PyExc_RuntimeError, "Unknown integer return code (assuming TPEXIT)");
 	    tp_returncode = TPEXIT;
+        */
 	}
     } else {
 	/* transform..() takes String or Dict */

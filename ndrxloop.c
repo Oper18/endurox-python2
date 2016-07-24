@@ -18,7 +18,7 @@
 #if defined(__cplusplus)
 extern "C" {
 #endif
-extern int _tmrunserver _((int));
+extern int _tmrunserver_(int);
 
 #if defined(__cplusplus)
 }
