@@ -18,10 +18,10 @@
 #include <pthread.h>            /* System header file */  
 #endif /* USE_THREADS */
 
-//#include <xa.h>                 /* ENDUROX Header File */
+/*#include <xa.h>*/                 /* ENDUROX Header File */
 #include <atmi.h>               /* ENDUROX Header File */
 #include "ubf.h"                /* ENDUROX Header File */
-//#include <tpadm.h>		/* ENDUROX Header File */
+/*#include <tpadm.h>*/		/* ENDUROX Header File */
 #include <userlog.h>            /* ENDUROX Header File */
 #include <ubf.h>              /* ENDUROX Header File */
 
@@ -437,7 +437,7 @@ mainloop(int argc, char** argv) {
 #endif
     int res = 0;
     
-    //res = _tmstartserver( argc, argv, _tmgetsvrargs());
+    /*res = _tmstartserver( argc, argv, _tmgetsvrargs());*/
     res = ndrx_main(argc, argv);
 }
 
@@ -1145,7 +1145,7 @@ static PyObject* ndrx_tpsuspend(PyObject* self, PyObject* arg) {
     int ret    = -1;
     long flags = 0;
 
-    //char tranid_strrep[TPCONVMAXSTR+1] = "";
+    /*char tranid_strrep[TPCONVMAXSTR+1] = "";*/
     TPTRANID tranid_binrep;
 
     if (PyArg_ParseTuple(arg, "|O", &flags_py) < 0) {
@@ -1182,7 +1182,7 @@ static PyObject* ndrx_tpsuspend(PyObject* self, PyObject* arg) {
     }
     */
     
-    //result = PyString_FromString(tranid_strrep);
+    /*result = PyString_FromString(tranid_strrep);*/
 
  leave_func:
     return result; 
@@ -1198,7 +1198,7 @@ static PyObject* ndrx_tpresume(PyObject* self, PyObject* arg) {
     PyObject * result         = NULL;
     PyObject * flags_py       = NULL;
 
-    //char*  tranid_strrep = NULL;
+    /*char*  tranid_strrep = NULL;*/
     
     TPTRANID tranid_binrep;
 
@@ -1209,7 +1209,7 @@ static PyObject* ndrx_tpresume(PyObject* self, PyObject* arg) {
     */	
     
 
-    //ret = tpconvert(tranid_strrep, (char*)&tranid_binrep, TPCONVTRANID);
+    /*ret = tpconvert(tranid_strrep, (char*)&tranid_binrep, TPCONVTRANID);*/
     if (ret < 0) {
 	char tmp[200] = "";
 	sprintf(tmp, "tpconvert(TRANID): %d - %s", tperrno, tpstrerror(tperrno));
@@ -1281,12 +1281,12 @@ ndrx_tpinit(PyObject * self, PyObject * args)
 	
 #define TPINITDATASIZE 4096
 
-	if ((ndrxbuf = (TPINIT*)tpalloc("TPINIT", NULL, TPINITNEED(TPINITDATASIZE))) == NULL) {
+	/*if ((ndrxbuf = (TPINIT*)tpalloc("TPINIT", NULL, TPINITNEED(TPINITDATASIZE))) == NULL) {
 	    char tmp[200] = "";
 	    sprintf(tmp, "tpalloc(TPINIT): %d - %s", tperrno, tpstrerror(tperrno));
 	    PyErr_SetString(PyExc_RuntimeError, tmp);
 	    goto leave_func;
-	}
+	}*/
 
 	keylist = PyDict_Keys(input);
 	if (!keylist) {
@@ -1460,16 +1460,16 @@ static PyObject* ndrx_tpchkauth(PyObject* self, PyObject* arg) {
     PyObject * result         = NULL;
     int ret = -1;
 
-    ret = tpchkauth() ;
+    /*ret = tpchkauth() ;
     if (ret < 0) {
 	char tmp[200] = "";
 	sprintf(tmp, "tpchkauth(): %d - %s", tperrno, tpstrerror(tperrno));
 	PyErr_SetString(PyExc_RuntimeError, tmp);
 	goto leave_func;
-    }
+    }*/
     
     result = PyLong_FromLong((long)ret);
- leave_func:
+ /*leave_func:*/
     return result; 
 }
 
@@ -2126,12 +2126,12 @@ static PyObject* ndrx_tpnotify(PyObject* self, PyObject* arg) {
     }
     */
     
-    if(tpnotify(&clientid, ndrxbuf, 0, flags) == -1) {
+    /*if(tpnotify(&clientid, ndrxbuf, 0, flags) == -1) {
 	char tmp[200] = "";
 	sprintf(tmp, "tpnotify(): %d - %s", tperrno, tpstrerror(tperrno));
 	PyErr_SetString(PyExc_RuntimeError, tmp);
 	goto leave_func;
-    }
+    }*/
     
     result = PyInt_FromLong((long)tpurcode);
 
@@ -2207,12 +2207,12 @@ static PyObject* ndrx_tpbroadcast(PyObject* self, PyObject* arg) {
 	goto leave_func;
     }
 
-    if (tpbroadcast(lmid, usrname, cltname, ndrxbuf,  0, flags) == -1) {
+    /*if (tpbroadcast(lmid, usrname, cltname, ndrxbuf,  0, flags) == -1) {
 	char tmp[200] = "";
 	sprintf(tmp, "tpbroadcast(): %d - %s", tperrno, tpstrerror(tperrno));
 	PyErr_SetString(PyExc_RuntimeError, tmp);
 	goto leave_func;
-    }
+    }*/
     
     result = PyInt_FromLong((long)tpurcode);
 
@@ -2287,7 +2287,7 @@ static PyObject* ndrx_tpsetunsol(PyObject* self, PyObject* arg) {
 	Py_INCREF(py_unsol_handler); /* needed */
     
 	
-    //} 
+    /*}*/ 
     if (py_unsol_handler == Py_None) {
         goto leave_func;
     } else if (PyCallable_Check(py_unsol_handler)){
@@ -2316,16 +2316,16 @@ static PyObject* ndrx_tpchkunsol(PyObject* self, PyObject* arg) {
     PyObject * result = NULL;
     long num_evts = 0;
 
-    if ((num_evts = tpchkunsol()) == -1) {
+    /*if ((num_evts = tpchkunsol()) == -1) {
 	char tmp[200] = "";
 	sprintf(tmp, "tpchkunsol(): %d - %s", tperrno, tpstrerror(tperrno));
 	PyErr_SetString(PyExc_RuntimeError, tmp);
 	goto leave_func;
-    }
+    }*/
     
     result = PyInt_FromLong((long)num_evts);
 
- leave_func:
+ /*leave_func:*/
     return result; 
 }
 
@@ -2427,9 +2427,9 @@ ndrx_mainloop(PyObject * self, PyObject * args)
 	}
     } 
 
-    if (xa_switch) {
+    /*if (xa_switch) {
 	_set_XA_switch((struct xa_switch_t*)PyCObject_AsVoidPtr((PyObject*) xa_switch)); 
-    }
+    }*/
 
     mainloop(argc, argv);
     
@@ -2477,7 +2477,7 @@ PyMODINIT_FUNC
 
     ins(d, "TPSUCCESS",	TPSUCCESS);
     ins(d, "TPFAIL",	TPFAIL);
-    //ins(d, "TPEXIT",	TPEXIT);
+    /*ins(d, "TPEXIT",	TPEXIT);*/
 
 
     /* Flags */
@@ -2493,7 +2493,7 @@ PyMODINIT_FUNC
     ins(d, "TPABSOLUTE", TPABSOLUTE);	/* absolute value on tmsetprio */
     ins(d, "TPGETANY", TPGETANY);	/* get any valid reply */
     ins(d, "TPNOCHANGE", TPNOCHANGE);	/* force incoming buffer to match */
-    //ins(d, "RESERVED_BIT1", RESERVED_BIT1);	/* reserved for future use */
+    /*ins(d, "RESERVED_BIT1", RESERVED_BIT1);*/	/* reserved for future use */
     ins(d, "TPCONV", TPCONV);	/* conversational service */
     ins(d, "TPSENDONLY", TPSENDONLY);	/* send-only mode */
     ins(d, "TPRECVONLY", TPRECVONLY);	/* recv-only mode */
@@ -2501,33 +2501,33 @@ PyMODINIT_FUNC
 
 
     /* Flags to tpscmt() - Valid TP_COMMIT_CONTROL characteristic values */
-    //ins(d, "TP_CMT_LOGGED", TP_CMT_LOGGED);  /* return after commit decision is logged */
-    //ins(d, "TP_CMT_COMPLETE", TP_CMT_COMPLETE);	/* return after commit has completed */
+    /*ins(d, "TP_CMT_LOGGED", TP_CMT_LOGGED);*/  /* return after commit decision is logged */
+    /*ins(d, "TP_CMT_COMPLETE", TP_CMT_COMPLETE);*/	/* return after commit has completed */
 
 
     /* Flags to tpinit() */
-    //ins(d, "TPU_MASK", TPU_MASK); /* unsolicited notification mask */
-    //ins(d, "TPU_SIG", TPU_SIG);	/* signal based notification */
-    //ins(d, "TPU_DIP", TPU_DIP);	/* dip-in based notification */
-    //ins(d, "TPU_IGN", TPU_IGN);	/* ignore unsolicited messages */
+    /*ins(d, "TPU_MASK", TPU_MASK);*/ /* unsolicited notification mask */
+    /*ins(d, "TPU_SIG", TPU_SIG);*/	/* signal based notification */
+    /*ins(d, "TPU_DIP", TPU_DIP);*/	/* dip-in based notification */
+    /*ins(d, "TPU_IGN", TPU_IGN);*/	/* ignore unsolicited messages */
 
-    //ins(d, "TPSA_FASTPATH", TPSA_FASTPATH);	/* System access == fastpath */
-    //ins(d, "TPSA_PROTECTED", TPSA_PROTECTED);	/* System access == protected */
+    /*ins(d, "TPSA_FASTPATH", TPSA_FASTPATH);*/	/* System access == fastpath */
+    /*ins(d, "TPSA_PROTECTED", TPSA_PROTECTED);*/	/* System access == protected */
 
-    //ins(d, "TPMULTICONTEXTS", TPMULTICONTEXTS);	/* Enable MULTI context */
+    /*ins(d, "TPMULTICONTEXTS", TPMULTICONTEXTS);*/	/* Enable MULTI context */
 
     /* Flags to tpconvert() */
-    //ins(d, "TPTOSTRING", TPTOSTRING);	/* Convert structure to string */
-    //ins(d, "TPCONVCLTID", TPCONVCLTID);	/* Convert CLIENTID */
-    //ins(d, "TPCONVTRANID", TPCONVTRANID);	/* Convert TRANID */
-    //ins(d, "TPCONVXID", TPCONVXID);	/* Convert XID */
+    /*ins(d, "TPTOSTRING", TPTOSTRING);*/	/* Convert structure to string */
+    /*ins(d, "TPCONVCLTID", TPCONVCLTID);*/	/* Convert CLIENTID */
+    /*ins(d, "TPCONVTRANID", TPCONVTRANID);*/	/* Convert TRANID */
+    /*ins(d, "TPCONVXID", TPCONVXID);*/	/* Convert XID */
 
-    //ins(d, "TPCONVMAXSTR", TPCONVMAXSTR);		/* Maximum string size */
+    /*ins(d, "TPCONVMAXSTR", TPCONVMAXSTR);*/		/* Maximum string size */
 
     /* Return values to tpchkauth() */
-    //ins(d, "TPNOAUTH", TPNOAUTH); /*authentication */
-    //ins(d, "TPSYSAUTH", TPSYSAUTH); /*authentication */
-    //ins(d, "TPAPPAUTH", TPAPPAUTH); /* and application authentication */
+    /*ins(d, "TPNOAUTH", TPNOAUTH);*/ /*authentication */
+    /*ins(d, "TPSYSAUTH", TPSYSAUTH);*/ /*authentication */
+    /*ins(d, "TPAPPAUTH", TPAPPAUTH);*/ /* and application authentication */
 
     ins(d, "MAXTIDENT", MAXTIDENT); /*len of a /T identifier */
 
@@ -2551,8 +2551,8 @@ PyMODINIT_FUNC
     /* Event Subscription related constants */
 
     ins(d, "TPEVSERVICE", TPEVSERVICE);
-    //ins(d, "TPEVQUEUE", TPEVQUEUE  );
-    //ins(d, "TPEVTRAN", TPEVTRAN   );
+    /*ins(d, "TPEVQUEUE", TPEVQUEUE  );*/
+    /*ins(d, "TPEVTRAN", TPEVTRAN   );*/
     ins(d, "TPEVPERSIST", TPEVPERSIST);
 
     
@@ -2669,9 +2669,9 @@ void endurox_dispatch(TPSVCINFO * rqst) {
     PyObject *py_cd = NULL;
     PyObject *py_flags = NULL;
     PyObject *py_appkey = NULL;
-    //char cltid_string[TPCONVMAXSTR+1] = "";
+    /*char cltid_string[TPCONVMAXSTR+1] = "";
     char* res_ndrx = NULL;
-    long tp_returncode = TPSUCCESS;
+    long tp_returncode = TPSUCCESS;*/
 
     /* reset user return code */
     _set_tpurcode = 0;
@@ -2815,40 +2815,40 @@ void endurox_dispatch(TPSVCINFO * rqst) {
        corresponding Ndrx data type. In this case, a return code of
        TPSUCCESS is returned */
     
-    if (PyInt_Check(pydata) || PyLong_Check(pydata)) {
+    /*if (PyInt_Check(pydata) || PyLong_Check(pydata)) {
 	switch (PyInt_AsLong(pydata)) {
 	case TPFAIL: 
 	    tp_returncode = TPFAIL; 
 	    break;
-        /*
+        
 	case TPEXIT: 
 	    tp_returncode = TPEXIT; 
 	    break;
-        */
+        
 	case TPSUCCESS:
 	    tp_returncode = TPSUCCESS; 
 	    break;
-        /*
+        
 	default:
 	    fprintf(stderr, "Unknown integer return code (assuming TPEXIT)");
 	    PyErr_SetString(PyExc_RuntimeError, "Unknown integer return code (assuming TPEXIT)");
 	    tp_returncode = TPEXIT;
-        */
+        
 	}
-    } else {
+    } else {*/
 	/* transform..() takes String or Dict */
-	if ((res_ndrx = transform_py_to_ndrx(pydata)) == NULL) {
+	/*if ((res_ndrx = transform_py_to_ndrx(pydata)) == NULL) {
 	    Py_XDECREF(obj);
 	    Py_XDECREF(pydata);
 	    tpreturn(TPFAIL, _set_tpurcode, 0, 0L, 0);
 	}
-    }
+    }*/
 
 
     Py_XDECREF(obj);
     Py_XDECREF(pydata);
     
-    if (_forward) {
+    /*if (_forward) {
 #ifdef DEBUG
 	printf("call tpforward(%s, ...)\n", _forward_service);
 #endif
@@ -2858,7 +2858,7 @@ void endurox_dispatch(TPSVCINFO * rqst) {
 	printf("call tpreturn(TPSUCCESS, ...)\n");
 #endif
 	tpreturn(tp_returncode, _set_tpurcode, (char*)res_ndrx, 0L, 0);
-    }
+    }*/
 }
 
 /* }}} */

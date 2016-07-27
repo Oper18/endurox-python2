@@ -28,10 +28,10 @@ extern void endurox_dispatch(TPSVCINFO * rqst);
 
 
 
-static struct tmdsptchtbl_t _tmdsptchtbl[] = {
+/*static struct tmdsptchtbl_t _tmdsptchtbl[] = {
     { "", "dispatch", (void (*) _((TPSVCINFO *))) endurox_dispatch, 0, 0 },  
     { NULL, NULL, NULL, 0, 0 }
-};
+};*/
 
 
 
@@ -43,20 +43,20 @@ _TMDLLIMPORT extern struct xa_switch_t tmnull_switch;
 
 static struct xa_switch_t* xa_switch = &tmnull_switch;
 
-static struct tmsvrargs_t tmsvrargs = {
+/*static struct tmsvrargs_t tmsvrargs = {
 	NULL,
 	&_tmdsptchtbl[0],
 	0,
 	tpsvrinit,
 	tpsvrdone,
-	_tmrunserver,	/* PRIVATE  */
-	NULL,			/* RESERVED */
-	NULL,			/* RESERVED */
-	NULL,			/* RESERVED */
-	NULL 			/* RESERVED */
-};
+	_tmrunserver,*/	/* PRIVATE  */
+	/*NULL,*/			/* RESERVED */
+	/*NULL,*/			/* RESERVED */
+	/*NULL,*/			/* RESERVED */
+	/*NULL*/ 			/* RESERVED */
+/*};*/
 
-struct tmsvrargs_t *
+/*struct tmsvrargs_t *
 #ifdef _TMPROTOTYPES
 _tmgetsvrargs(void)
 #else
@@ -65,7 +65,7 @@ _tmgetsvrargs()
 {
     tmsvrargs.xa_switch = xa_switch;
     return(&tmsvrargs);
-}
+}*/
 
 
 void _set_XA_switch(struct xa_switch_t* new_xa_switch) 
